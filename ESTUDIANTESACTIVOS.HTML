@@ -1,0 +1,629 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudiantes Activos</title>
+    <style>
+      * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #b7c4ff;
+        }
+
+        .header {
+            background: linear-gradient(to right, #1a237e, #3949ab);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .auth-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #1a237e;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #3949ab;
+        }
+
+        .carreras-section {
+            display: none;
+            gap: 20px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .carrera-btn {
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+            padding: 20px;
+            font-size: 18px;
+            background-color: #108397;
+        }
+
+        .semestres-section {
+            display: none;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .semestre-btn {
+            background-color: #2196F3;
+            min-width: 150px;
+        }
+
+        .tareas-section {
+            display: none;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        .tarea-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .user-info {
+            display: none;
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .nueva-tarea-form {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .success-message {
+            background-color:#9eff74;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .error-message {
+            background-color: #f44336;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+        <div class="header">
+        <h1>Estudiantes Activos</h1>
+    </div>
+
+    <div class="container">
+        <!-- Sección de Autenticación -->
+        <div id="authSection" class="auth-section">
+            <div id="loginForm">
+                <h2>Iniciar Sesión</h2>
+                <div class="form-group">
+                    <label for="loginMatricula">Matrícula:</label>
+                    <input type="text" id="loginMatricula" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button onclick="login()">Iniciar Sesión</button>
+                <button onclick="toggleForms()">Registrarse</button>
+            </div>
+
+            <div id="registerForm" style="display: none;">
+                <h2>Registro</h2>
+                <div class="form-group">
+                    <label for="regMatricula">Matrícula:</label>
+                    <input type="text" id="regMatricula" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Contraseña:</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="userType">Tipo de Usuario:</label>
+                    <select id="userType">
+                        <option value="alumno">Alumno</option>
+			<option value="profesor">Profesor</option>
+                        <option value="jefeGrupo">Jefe de Grupo</option>
+                    </select>
+                </div>
+                <button onclick="register()">Registrarse</button>
+                <button onclick="toggleForms()">Volver a Iniciar Sesión</button>
+            </div>
+        </div>
+
+        <!-- Información del Usuario -->
+        <div id="userInfo" class="user-info">
+            <h3>Bienvenido <span id="userName"></span></h3>
+            <p id="userRole"></p>
+            <button onclick="logout()">Cerrar Sesión</button>
+        </div>
+
+        <!-- Sección de Carreras -->
+        <div id="carrerasSection" class="carreras-section">
+            <button class="carrera-btn" onclick="showSemestres('mercadotecnia')">MERCADOTECNIA Y MEDIOS DIGITALES</button>
+            <button class="carrera-btn" onclick="showSemestres('derecho')">DERECHO</button>
+            <button class="carrera-btn" onclick="showSemestres('administración')">ADMINISTRACIÓN Y POLITICAS PUBLICAS</button>
+        </div>
+
+        <!-- Sección de Semestres -->
+        <div id="semestresSection" class="semestres-section"></div>
+
+        <!-- Sección de Tareas -->
+        <div id="tareasSection" class="tareas-section">
+            <h2>Tareas</h2>
+            <div id="tareasList"></div>
+            
+            <div id="nuevaTareaForm" class="nueva-tarea-form" style="display: none;">
+                <h3>Agregar Nueva Tarea</h3>
+                <div class="form-group">
+                    <label for="materia">Materia:</label>
+                    <input type="text" id="materia" required>
+                </div>
+		 <div class="form-group">
+                    <label for="tareaTitulo">Título:</label>
+                    <input type="text" id="tareaTitulo" required>
+                </div>
+                <div class="form-group">
+                    <label for="tareaDescripcion">Descripción:</label>
+                    <textarea id="tareaDescripcion" required style="width: 100%; min-height: 100px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="tareaFecha">Fecha de entrega:</label>
+                    <input type="date" id="tareaFecha" required>
+                </div>
+                <button onclick="agregarTarea()">Guardar Tarea</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentUser = null;
+        let currentRole = null;
+        let currentCarrera = null;
+        let currentSemestre = null;
+
+        // Base de datos simulada
+        const db = {
+            usuarios: [
+                { matricula: "admin", password: "admin", role: "jefeGrupo" },
+                { matricula: "alumno", password: "alumno", role: "alumno" },
+		{ matricula: "profesor", password: "profesor", role: "profesor" }
+            ],
+            tareas: {
+                mercadotecnia: {}, derecho: {}, administración: {}
+            }
+        };
+
+        // Inicializar semestres en la base de datos
+        ['mercadotecnia', 'derecho', 'administración'].forEach(carrera => {
+            for(let i = 1; i <= 8; i++) {
+                db.tareas[carrera][i] = [];
+            }
+        });
+
+        // Funciones de autenticación
+        function toggleForms() {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+            registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function login() {
+            const matricula = document.getElementById('loginMatricula').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const user = db.usuarios.find(u => u.matricula === matricula && u.password === password);
+
+            if (user) {
+                currentUser = matricula;
+                currentRole = user.role;
+                showDashboard();
+                showSuccessMessage('Inicio de sesión exitoso');
+            } else {
+                showErrorMessage('Credenciales incorrectas');
+            }
+        }
+
+        function register() {
+            const matricula = document.getElementById('regMatricula').value;
+            const password = document.getElementById('regPassword').value;
+            const role = document.getElementById('userType').value;
+
+            if (db.usuarios.some(u => u.matricula === matricula)) {
+                showErrorMessage('Esta matrícula ya está registrada');
+                return;
+            }
+
+            db.usuarios.push({ matricula, password, role });
+            showSuccessMessage('Registro exitoso');
+            toggleForms();
+        }
+
+        function logout() {
+            currentUser = null;
+            currentRole = null;
+            resetUI();
+        }
+ 
+// Funciones de UI
+        function showDashboard() {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('carrerasSection').style.display = 'flex';
+            
+            document.getElementById('userName').textContent = currentUser;
+            document.getElementById('userRole').textContent = `Rol: ${currentRole}`;
+        }
+
+        function resetUI() {
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('carrerasSection').style.display = 'none';
+            document.getElementById('semestresSection').style.display = 'none';
+            document.getElementById('tareasSection').style.display = 'none';
+            document.getElementById('loginMatricula').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function showSemestres(carrera) {
+            currentCarrera = carrera;
+            const semestresSection = document.getElementById('semestresSection');
+            semestresSection.style.display = 'flex';
+            semestresSection.innerHTML = '';
+
+            for(let i = 1; i <= 8; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'semestre-btn';
+                btn.textContent = `Semestre ${i}`;
+                btn.onclick = () => showTareas(i);
+                semestresSection.appendChild(btn);
+            }
+        }
+
+        function showTareas(semestre) {
+            currentSemestre = semestre;
+            const tareasSection = document.getElementById('tareasSection');
+            const tareasList = document.getElementById('tareasList');
+            const nuevaTareaForm = document.getElementById('nuevaTareaForm');
+
+            tareasSection.style.display = 'block';
+            tareasList.innerHTML = `<h3>Tareas de ${currentCarrera} - Semestre ${semestre}</h3>`;
+            nuevaTareaForm.style.display = currentRole === 'jefeGrupo' ? 'block' : 'none';
+
+            const tareas = db.tareas[currentCarrera][semestre];
+            if (tareas.length === 0) {
+                tareasList.innerHTML += '<p>No hay tareas asignadas para este semestre.</p>';
+            } else {
+                tareas.forEach(tarea => {
+                    const tareaElement = document.createElement('div');
+                    tareaElement.className = 'tarea-item';
+                    tareaElement.innerHTML = `
+                        <h4>${tarea.titulo}</h4>
+                        <p>${tarea.descripcion}</p>
+                        <p><strong>Fecha de entrega:</strong> ${tarea.fecha}</p>
+                        <p><small>Creado por: ${tarea.creadorMatricula}</small></p>
+                    `;
+                    tareasList.appendChild(tareaElement);
+                });
+            }
+        }
+
+        function agregarTarea() {
+            const titulo = document.getElementById('tareaTitulo').value;
+            const descripcion = document.getElementById('tareaDescripcion').value;
+            const fecha = document.getElementById('tareaFecha').value;
+
+            if (!titulo || !descripcion || !fecha) {
+                showErrorMessage('Por favor completa todos los campos');
+                return;
+            }
+
+            const nuevaTarea = {
+                titulo,
+                descripcion,
+                fecha,
+                creadorMatricula: currentUser,
+                fechaCreacion: new Date().toISOString()
+            };
+
+            db.tareas[currentCarrera][currentSemestre].push(nuevaTarea);
+            showSuccessMessage('Tarea agregada exitosamente');
+
+            document.getElementById('tareaTitulo').value = '';
+            document.getElementById('tareaDescripcion').value = '';
+            document.getElementById('tareaFecha').value = '';
+
+            showTareas(currentSemestre);
+        }
+
+        function showSuccessMessage(message) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'success-message';
+            msgDiv.textContent = message;
+            document.querySelector('.container').insertBefore(msgDiv, document.querySelector('.container').firstChild);
+            setTimeout(() => msgDiv.remove(), 3000);
+        }
+
+        function showErrorMessage(message) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'error-message';
+            msgDiv.textContent = message;
+            document.querySelector('.container').insertBefore(msgDiv, document.querySelector('.container').firstChild);
+            setTimeout(() => msgDiv.remove(), 3000);
+        }
+    </script>
+     <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .comment-section {
+            background-color: #b7c4ff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .comment-form input, 
+        .comment-form textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .comment-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .comment {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .reply {
+            margin-left: 30px;
+            background-color: #b7c4ff;
+        }
+        .reply-form {
+            margin-top: 10px;
+            display: none;
+        }
+        .action-btn {
+            background-color: #b7c4ff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="comment-section">
+        <h2>Comentarios</h2>
+        
+        <div class="comment-form">
+            <input type="text" id="nameInput" placeholder="Tu nombre">
+            <textarea id="commentInput" placeholder="Escribe tu comentario"></textarea>
+            <button class="action-btn" onclick="addComment()">Enviar Comentario</button>
+        </div>
+
+        <div id="commentsList"></div>
+    </div>
+
+    <script>
+        // Array para almacenar comentarios
+        let comments = JSON.parse(localStorage.getItem('comments')) || [];
+
+        // Función para guardar comentarios en localStorage
+        function saveComments() {
+            localStorage.setItem('comments', JSON.stringify(comments));
+        }
+
+        // Función para formatear fecha
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('es-ES', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Función para renderizar comentarios
+        function renderComments() {
+            const commentsList = document.getElementById('commentsList');
+            commentsList.innerHTML = '';
+            
+            comments.forEach((comment, index) => {
+                const commentDiv = document.createElement('div');
+                commentDiv.classList.add('comment');
+                
+                // Contenido del comentario principal
+                commentDiv.innerHTML = `
+                    <div class="comment-header">
+                        <strong>${comment.name}</strong>
+                        <span>${formatDate(comment.date)}</span>
+                    </div>
+                    <p>${comment.text}</p>
+                    <button class="action-btn" onclick="toggleReplyForm(${index})">Responder</button>
+                    
+                    <div class="reply-form" id="replyForm-${index}">
+                        <input type="text" id="replyNameInput-${index}" placeholder="Tu nombre">
+                        <textarea id="replyTextInput-${index}" placeholder="Escribe tu respuesta"></textarea>
+                        <button class="action-btn" onclick="addReply(${index})">Enviar Respuesta</button>
+                    </div>
+                `;
+
+                // Añadir respuestas si existen
+                if (comment.replies && comment.replies.length > 0) {
+                    comment.replies.forEach(reply => {
+                        const replyDiv = document.createElement('div');
+                        replyDiv.classList.add('comment', 'reply');
+                        replyDiv.innerHTML = `
+                            <div class="comment-header">
+                                <strong>${reply.name}</strong>
+                                <span>${formatDate(reply.date)}</span>
+                            </div>
+                            <p>${reply.text}</p>
+                        `;
+                        commentDiv.appendChild(replyDiv);
+                    });
+                }
+
+                commentsList.appendChild(commentDiv);
+            });
+        }
+
+        // Función para añadir comentario
+        function addComment() {
+            const nameInput = document.getElementById('nameInput');
+            const commentInput = document.getElementById('commentInput');
+
+            if (nameInput.value.trim() && commentInput.value.trim()) {
+                const newComment = {
+                    name: nameInput.value,
+                    text: commentInput.value,
+                    date: new Date().toISOString(),
+                    replies: []
+                };
+
+                comments.push(newComment);
+                saveComments();
+                renderComments();
+
+                // Limpiar inputs
+                nameInput.value = '';
+                commentInput.value = '';
+            } else {
+                alert('Por favor, complete todos los campos');
+            }
+        }
+
+        // Función para mostrar/ocultar formulario de respuesta
+        function toggleReplyForm(index) {
+            const replyForm = document.getElementById(`replyForm-${index}`);
+            replyForm.style.display = replyForm.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Función para añadir respuesta
+        function addReply(parentIndex) {
+            const replyNameInput = document.getElementById(`replyNameInput-${parentIndex}`);
+            const replyTextInput = document.getElementById(`replyTextInput-${parentIndex}`);
+
+            if (replyNameInput.value.trim() && replyTextInput.value.trim()) {
+                const newReply = {
+                    name: replyNameInput.value,
+                    text: replyTextInput.value,
+                    date: new Date().toISOString()
+                };
+
+                comments[parentIndex].replies = comments[parentIndex].replies || [];
+                comments[parentIndex].replies.push(newReply);
+                
+                saveComments();
+                renderComments();
+
+                // Limpiar inputs y ocultar formulario
+                replyNameInput.value = '';
+                replyTextInput.value = '';
+                toggleReplyForm(parentIndex);
+            } else {
+                alert('Por favor, complete todos los campos');
+            }
+        }
+
+        // Inicializar renderizado de comentarios
+        renderComments();
+    </script>
+</body>
+</html>
